@@ -1,0 +1,5 @@
+[client]
+database = mywebsite
+user = root
+password = xhm900119
+default-character-set = utf8mb4
