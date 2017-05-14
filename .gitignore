@@ -3,6 +3,11 @@
 *.so
 *.egg
 *.egg-info
+
+# django
+*.log
+*.sqlite3
+
 dist
 build
 
