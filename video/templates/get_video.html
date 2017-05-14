@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link href="http://cdn.bootcss.com/video.js/6.0.0-RC.8/video-js.css" rel="stylesheet">
+
+</head>
+<body>
+    
+    <div id='input-container' class="container">
+      <p class="col-md-4">请输入视频网址</p>
+      <div class='col-md-9'>
+        <form id='choice' action="/parse_website/" method="get">
+          <div class='.form-group'>
+              <label for="">url</label>
+              <input class='form-control' type="text" id='get_url' name='get_url' placeholder="url"> 
+          </div>
+          <div class='.form-group'>
+            <p id='result'>result:</p>
+          </div>
+          <div class='.form-group'>
+            <button class='btn btn-info' type='button' id='get_website'>submit</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-8 center-block">
+        <div id='play-setting' class="col-md-8"></div>
+        <video id="my-video" class="video-js vjs-big-play-centered " controls preload="auto" width="640" height="480"  data-setup="{}"></video>
+      </div>
+    </div>
+    
+
+    <!-- script -->
+    <script src="http://cdn.bootcss.com/video.js/6.0.0-RC.8/video.js"></script>
+    <script>
+        videojs.options.flash.swf = "http://cdn.bootcss.com/video.js/6.0.0/video-js.swf";
+    </script>
+    <script src="http://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <link href="http://cdn.bootcss.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" rel="stylesheet">
+    <script src="http://cdn.bootcss.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js"></script>
+
+    <!-- script -->
+    <script type="text/javascript" >
+    function play_video_set(video_set)
+      {
+          var myPlayer = videojs('my-video')
+          var set_len = video_set.length;
+          var curr = 0
+          myPlayer.src({type: "video/mp4", src: video_set[curr]});
+          myPlayer.ready(function(){});
+          myPlayer.on('ended', function()
+            {
+              curr++;
+              if (curr<set_len){
+                myPlayer.src({type: "video/mp4", src: video_set[curr]});
+                myPlayer.play();
+              }
+              else{
+                myPlayer.src({type: "video/mp4", src: video_set[0]});
+              }
+            });
+        };
+
+    function parse_and_play(result)
+      { 
+          console.log( 'my object is ');
+          result =  JSON.parse(result);
+          var l=document.getElementById("link");
+          if (result.video_urls)
+            {
+              for (var v_i in result.video_urls) {
+                var link=$("<div></div>").text(result.video_urls[v_i]['type']+'下载链接: ');
+                link.addClass('col-md-12');
+                var  play_btn =$("<button></button>");
+                play_btn.text(result.video_urls[v_i]['type']);
+                play_btn.addClass('btn btn-info');
+                play_btn.attr('ind',v_i);
+                play_btn.click(function(){
+                  var p_i = $(this).attr('ind');
+                  play_video_set(result.video_urls[p_i]['urls']);
+                });
+                $('#play-setting').append(play_btn);
+
+                for (var i=0 ; i<result.video_urls[v_i]['urls'].length ; i++){
+                  var a=$("<a></a>");
+                  a.attr('href',result.video_urls[v_i]['urls'][i]);
+                  a.text('part'+i.toString());
+                  a.addClass('col-md-2');
+                  link.append(a);
+                }
+                $('#result').append(link);
+              }
+            }
+          else
+            {
+              var link=$("<p></p>").text(result.vid);
+              link.attr('id','link');
+              $('#result').append(link);
+            }
+          };
+    $(document).ready(function(){
+      var video_src;
+      $("#get_website").click(function(){
+        $('#result').empty();
+        $('#play-setting').empty();
+        console.log( 'my object is ');
+        var get_url = $("#get_url").val();
+        $.ajax({
+          url:"parse_website/",
+          data:{'url':get_url}, 
+          success:parse_and_play,
+        })
+        }
+        });
+        });
+    </script>
+</body>
+</html>
