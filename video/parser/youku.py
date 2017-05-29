@@ -62,7 +62,6 @@ def get_urls_from_vid(vid):
     video_urls_dict = {}
     for video in data['stream']:
         video_urls_dict[video['stream_type']] = [i['cdn_url'] for i in video['segs']]
-    print(video_urls_dict)
     return video_urls_dict
 
 
