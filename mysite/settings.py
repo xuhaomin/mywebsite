@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'liepin',
     'zhihu',
     'bilibili',
+    'slogan',
 ]
 
 MIDDLEWARE = [
